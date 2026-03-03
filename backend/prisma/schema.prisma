@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Task {
+  id           String   @id @default(cuid())
+  title        String
+  description  String?
+  status       TaskStatus @default(PENDING)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  completedAt  DateTime?
+  dateKey      String   /// YYYY-MM-DD representation of createdAt for efficient per-day queries
+
+  @@index([dateKey])
+}
+
+model ArchivedTask {
+  id              String   @id @default(cuid())
+  originalTaskId  String
+  title           String
+  description     String?
+  status          TaskStatus
+  createdAt       DateTime
+  updatedAt       DateTime
+  completedAt     DateTime?
+  dateKey         String   /// Same dateKey as on Task
+  archivedAt      DateTime @default(now())
+
+  @@index([dateKey])
+}
+
+model DailySummary {
+  id                     String   @id @default(cuid())
+  dateKey                String   /// YYYY-MM-DD
+  totalCreated           Int
+  totalCompleted         Int
+  totalPendingEndOfDay   Int
+  completionPercentage   Int
+  generatedAt            DateTime @default(now())
+
+  notifications DailySummaryNotification[]
+
+  @@unique([dateKey])
+}
+
+model DailySummaryNotification {
+  id          String       @id @default(cuid())
+  dateKey     String
+  summaryId   String
+  summary     DailySummary @relation(fields: [summaryId], references: [id])
+  message     String
+  sentAt      DateTime     @default(now())
+
+  @@index([dateKey])
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  NOT_COMPLETED
+}

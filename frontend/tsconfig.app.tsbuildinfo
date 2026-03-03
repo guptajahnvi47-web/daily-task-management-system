@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/types.ts","./src/components/dailyboard.tsx","./src/components/historyview.tsx","./src/components/taskform.tsx","./src/components/tasklist.tsx","./src/services/api.ts","./src/services/localtaskservice.ts","./src/utils/date.ts"],"errors":true,"version":"5.9.3"}
